@@ -22,6 +22,26 @@ USER_DATA = config["user_data"]
 START_TIME = time.time()
 USER_STATE = {}  # Tracks per-user upload state
 
+# ReplyKeyboardMarkup layouts
+owner_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton("/adduser"), KeyboardButton("/removeuser")],
+        [KeyboardButton("Userlist"), KeyboardButton("Ping")],
+        [KeyboardButton("Rules"), KeyboardButton("Reset")],
+        [KeyboardButton("Help")]
+    ],
+    resize_keyboard=True
+)
+
+user_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton("Ping")],
+        [KeyboardButton("Rules")],
+        [KeyboardButton("Help")]
+    ],
+    resize_keyboard=True
+)
+
 def save_config():
     with open("config.json", "w") as f:
         json.dump({
@@ -44,15 +64,32 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("Give me Your Channel ID", callback_data="get_channel_id")],
         [InlineKeyboardButton("Give me Your Caption", callback_data="get_caption")]
     ]
+    reply_kb = owner_keyboard if user_id == OWNER_ID else user_keyboard
+
     await update.message.reply_text(
-        "Hey Buddy How Are You ?\n/help to find your solution !",
+        "Hey Buddy How Are You?\nUse /help to find your solution!",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
+    await update.message.reply_text("Choose a command below:", reply_markup=reply_kb)
+    
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if is_authorized(update.effective_user.id):
-        await update.message.reply_text("Help:\n/start\n/adduser\n/removeuser\n/userlist\n/ping\n/rules\n/reset")
+    if not is_authorized(update.effective_user.id):
+        await update.message.reply_text("Access Denied.")
+        return
 
+    text = (
+        "Available Commands:\n"
+        "/start - Start Interaction\n"
+        "/adduser - Add user access (Owner Only)\n"
+        "/removeuser - Remove user access (Owner Only)\n"
+        "Userlist - List of Allowed Users (Owner Only)\n"
+        "Ping - Check Bot Uptime\n"
+        "Rules - View Bot Rules\n"
+        "Reset - Clear all User Captions/Channels\n"
+    )
+    await update.message.reply_text(text, reply_markup=owner_keyboard if update.effective_user.id == OWNER_ID else user_keyboard)
+    
 async def add_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != OWNER_ID:
         await update.message.reply_text("Access Denied.")
@@ -103,7 +140,7 @@ async def userlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
         username = user_data.get("username", "N/A")
         channel = user_data.get("channel", "N/A")
         link = f"[{user_id}](tg://openmessage?user_id={user_id})"
-        lines.append(f"NickName: {nickname}\nUsername: @{username}\nUserChannel: {channel}\nUser ID: {link}\n")
+        lines.append(f"NickName: {nickname}\nUsername: @{username}\nChannel: {channel}\nUser ID: {link}\n")
 
     await update.message.reply_text("\n".join(lines), parse_mode="Markdown")
 
@@ -122,31 +159,30 @@ async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
     today = datetime.datetime.now().strftime("%d : %m : %Y")
     await update.message.reply_text(
         f"Update - {today}\n"
-        f"Uptime - {days} : {hours} : {minutes} : {seconds}\n"
+        f"Uptime - {days}D : {hours}H : {minutes}M : {seconds}S\n"
         f"Ping - {ping_ms:.2f} ms"
     )
 
 async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_authorized(update.effective_user.id):
-        await update.message.reply_text("Access Denied.")
+    await update.message.reply_text("Access Denied.")
         return
 
     await update.message.reply_text(
-        "Dont Spam This Bot Sometimes U Will Get Ban\n"
-        "Any Kind of errors DM - @Ceo_DarkFury"
+        "Don't spam the bot — abuse may lead to ban.\n"
+        "For issues, contact @Ceo_DarkFury"
     )
-
 async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_authorized(update.effective_user.id):
-        await update.message.reply_text("Access Denied.")
+    await update.message.reply_text("Access Denied.")
         return
 
-    for user_id in USER_DATA:
-        USER_DATA[user_id]["channel"] = ""
-        USER_DATA[user_id]["caption"] = ""
+    for user in USER_DATA:
+        USER_DATA[user]["channel"] = ""
+        USER_DATA[user]["caption"] = ""
     save_config()
-    await update.message.reply_text("Reseted all Caption and Channel ID")
-
+    await update.message.reply_text("All user data (channel/caption) has been reset.")
+    
 async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if not is_authorized(user_id):
@@ -234,9 +270,9 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     user_id = query.from_user.id
 
-    if user_id not in USER_STATE:
-        await query.edit_message_text("Session expired or invalid.")
-        return
+    if user_id not in USER_STATE and query.data not in ["get_channel_id", "get_caption"]:
+    await query.edit_message_text("Session expired or invalid.")
+    return
 
     data = query.data
     state = USER_STATE[user_id]
