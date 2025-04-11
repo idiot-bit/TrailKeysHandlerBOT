@@ -164,7 +164,7 @@ async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not is_authorized(update.effective_user.id)
+    if not is_authorized(update.effective_user.id):
         return
 
     await update.message.reply_text(
