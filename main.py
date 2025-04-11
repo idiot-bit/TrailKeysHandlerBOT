@@ -11,7 +11,6 @@ if not BOT_TOKEN:
     raise ValueError("BOT_TOKEN environment variable not set")
 
 app = Application.builder().token(BOT_TOKEN).build()
-
 # Load config
 with open("config.json") as f:
     config = json.load(f)
@@ -282,7 +281,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # You’ll add other handlers here...
 
 def main():
-    app = Application.builder().token("YOUR_BOT_TOKEN").build()
+    app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("adduser", add_user))
@@ -295,8 +294,6 @@ def main():
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_text))
     app.add_handler(CallbackQueryHandler(handle_callback))
 
-    # Continue adding all commands...
-    
     app.run_polling()
 
 if __name__ == "__main__":
