@@ -6,7 +6,9 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKe
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ContextTypes
 import os
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
+BOT_TOKEN = os.getenv("BOT_TOKEN")  # Get token from Railway environment
+if not BOT_TOKEN:
+    raise ValueError("BOT_TOKEN environment variable not set")
 
 app = Application.builder().token(BOT_TOKEN).build()
 
