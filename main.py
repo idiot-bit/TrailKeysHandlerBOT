@@ -173,7 +173,6 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_authorized(update.effective_user.id):
-    await update.message.reply_text("Access Denied.")
         return
 
     for user in USER_DATA:
