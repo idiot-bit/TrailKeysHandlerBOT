@@ -223,29 +223,29 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     match = re.search(r'Key\s*-\s*(\S+)', caption)
-if match:
-    key = match.group(1)
+    if match:
+        key = match.group(1)
 
-    saved_caption = USER_DATA.get(str(user_id), {}).get("caption", "")
-    if "Key -" in saved_caption:
-        final_caption = saved_caption.replace("Key -", f"`Key - {key}`")
+        saved_caption = USER_DATA.get(str(user_id), {}).get("caption", "")
+        if "Key -" in saved_caption:
+            final_caption = saved_caption.replace("Key -", f"`Key - {key}`")
+        else:
+            final_caption = caption
+
+        USER_STATE[user_id] = {
+            "file_id": doc.file_id,
+            "caption": final_caption,
+            "status": "confirm_share"
+        }
+        await ask_to_share(update)
     else:
-        final_caption = caption
-
-    USER_STATE[user_id] = {
-        "file_id": doc.file_id,
-        "caption": final_caption,
-        "status": "confirm_share"
-    }
-    await ask_to_share(update)
-else:
-    USER_STATE[user_id] = {
-        "file_id": doc.file_id,
-        "caption": "",  # To be filled
-        "status": "waiting_key"
-    }
-    await update.message.reply_text("Awesome! Now, please send the *Key* you want to attach.", parse_mode="Markdown")
-
+        USER_STATE[user_id] = {
+            "file_id": doc.file_id,
+            "caption": "",  # To be filled
+            "status": "waiting_key"
+        }
+        await update.message.reply_text("Awesome! Now, please send the *Key* you want to attach.", parse_mode="Markdown")
+        
 async def ask_to_share(update: Update):
     keyboard = [
         [InlineKeyboardButton("Yes", callback_data="share_yes"),
