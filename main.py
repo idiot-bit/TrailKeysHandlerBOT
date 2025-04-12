@@ -5,6 +5,7 @@ import random
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ContextTypes
 import os
+import re
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")  # Get token from Railway environment
 if not BOT_TOKEN:
@@ -57,6 +58,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("🚀𝗪𝗵𝗮𝘁 𝗕𝗿𝘂𝗵 , 𝗜𝘁❜𝘀 𝗩𝗲𝗿𝘆 𝗪𝗿𝗼𝗻𝗴 𝗕𝗿𝗼 😂")
         return
 
+# Save basic user data (first name, username)
+USER_DATA[str(user_id)] = {
+    "first_name": update.effective_user.first_name,
+    "username": update.effective_user.username,
+    "channel": USER_DATA.get(str(user_id), {}).get("channel", ""),
+    "caption": USER_DATA.get(str(user_id), {}).get("caption", "")
+}
+save_config()
+
     inline_keyboard = [
         [InlineKeyboardButton("Add me to Your Channel", url="https://t.me/TrailKeysHandlerBOT?startchannel=true")],
         [InlineKeyboardButton("Give me Your Channel ID", callback_data="get_channel_id")],
@@ -66,26 +76,29 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_kb = owner_keyboard if user_id == OWNER_ID else allowed_user_keyboard
 
     await update.message.reply_text(
-        "Hey Buddy How Are You ?\n/help to find your solution !",
+        "Hey there, Rockstar!\nWelcome to your APK Sharing Assistant.\nUse /help to explore powerful features designed just for you!",
+        USER_STATE[user_id] = {"status": "idle"}
         reply_markup=InlineKeyboardMarkup(inline_keyboard)
     )
-    await update.message.reply_text("Main Menu Loaded", reply_markup=reply_kb)
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if user_id == OWNER_ID:
         await update.message.reply_text(
             "Available Commands:\n"
+            "/start - Restart bot interaction\n"
             "/adduser - Add allowed user\n"
             "/removeuser - Remove allowed user\n"
             "/userlist - Show all allowed users\n"
             "/ping - Bot status\n"
             "/rules - Bot usage rules\n"
             "/reset - Reset user data"
+            "Available Commands:\n"
         )
     elif user_id in ALLOWED_USERS:
         await update.message.reply_text(
             "Available Commands:\n"
+            "/start - Restart bot interaction\n"
             "/ping - Bot status\n"
             "/rules - Bot usage rules\n"
             "/reset - Reset your data"
@@ -134,22 +147,23 @@ async def userlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("No allowed users.")
         return
 
-    lines = []
+    lines = ["**👥 Allowed Users List:**"]
     for user_id in ALLOWED_USERS:
         user_data = USER_DATA.get(str(user_id), {})
-        nickname = user_data.get("first_name", "N/A")
-        username = user_data.get("username", "N/A")
-        channel = user_data.get("channel", "N/A")
-        link = f"[Click Here](tg://user?id={user_id})"
 
-        lines.append(
+        nickname = user_data.get("first_name")
+        username = user_data.get("username")
+        channel = user_data.get("channel")
+
+        user_line = (
             "━━━━━━━━━━━━━━━━━━━━\n"
-            f"NickName : {nickname}\n"
-            f"Username : @{username}\n"
-            f"UserChannel : {channel}\n"
-            f"UserID : {link}\n"
+            f"**👤NickName** : {nickname if nickname else '—'}\n"
+            f"**👽Username** : {'@' + username if username else '—'}\n"
+            f"**🌝UserChannel** : {channel if channel else '—'}\n"
+            f"**🗣️UserID** : [Click Here](tg://openmessage?user_id={user_id})\n"
             "━━━━━━━━━━━━━━━━━━━━"
         )
+        lines.append(user_line)
 
     await update.message.reply_text("\n".join(lines), parse_mode="Markdown")
 
@@ -181,8 +195,7 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     await update.message.reply_text(
-        "Dont Spam This Bot Sometimes U Will Get Ban\n"
-        "Any Kind of errors DM - @Ceo_DarkFury"
+        "🚫 Please avoid spamming the bot.\nViolations can lead to a ban without notice.\n\nFor support or feedback, contact: @Ceo_DarkFury"
     )
 
 async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -209,20 +222,29 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Only APK files are supported.")
         return
 
-    if "Key -" in caption:
-        USER_STATE[user_id] = {
-            "file_id": doc.file_id,
-            "caption": caption,
-            "status": "confirm_share"
-        }
-        await ask_to_share(update)
+    if re.search(r'Key\s*-\s*(\S+)', caption):
+    match = re.search(r'Key\s*-\s*(\S+)', caption)
+    key = match.group(1)
+
+    saved_caption = USER_DATA.get(str(user_id), {}).get("caption", "")
+    if "Key -" in saved_caption:
+        final_caption = saved_caption.replace("Key -", f"`Key - {key}`")
+    else:
+        final_caption = caption
+
+    USER_STATE[user_id] = {
+        "file_id": doc.file_id,
+        "caption": final_caption,
+        "status": "confirm_share"
+    }
+    await ask_to_share(update)
     else:
         USER_STATE[user_id] = {
             "file_id": doc.file_id,
             "caption": "",  # To be filled
             "status": "waiting_key"
         }
-        await update.message.reply_text("Send the Key Now")
+        await update.message.reply_text("Awesome! Now, please send the *Key* you want to attach.", parse_mode="Markdown")
 
 async def ask_to_share(update: Update):
     keyboard = [
@@ -265,10 +287,14 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         key = update.message.text
         caption = USER_DATA.get(str(user_id), {}).get("caption", "")
         if "Key -" not in caption:
-            await update.message.reply_text("Your original caption doesn't include 'Key -' placeholder.")
+            await update.message.reply_text(
+    "Oops! Your saved caption doesn't contain the `Key -` placeholder.\n"
+    "Please update your caption using /start → 'Give me Your Caption'.",
+    parse_mode="Markdown"
+       )
             return
 
-        final_caption = caption.replace("Key -", f"Key - {key}")
+        final_caption = caption.replace("Key -", f"`Key - {key}`")
         USER_STATE[user_id].update({
             "caption": final_caption,
             "status": "confirm_share"
@@ -316,6 +342,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=channel_id,
             document=state["file_id"],
             caption=state["caption"],
+            parse_mode="Markdown",  # <-- ADD THIS
             disable_notification=True
         )
 
