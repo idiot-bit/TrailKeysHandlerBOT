@@ -75,9 +75,9 @@ USER_DATA[str(user_id)] = {
 
     reply_kb = owner_keyboard if user_id == OWNER_ID else allowed_user_keyboard
 
+    USER_STATE[user_id] = {"status": "idle"}
     await update.message.reply_text(
         "Hey there, Rockstar!\nWelcome to your APK Sharing Assistant.\nUse /help to explore powerful features designed just for you!",
-        USER_STATE[user_id] = {"status": "idle"}
         reply_markup=InlineKeyboardMarkup(inline_keyboard)
     )
 
