@@ -92,65 +92,68 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if user_id == OWNER_ID:
         await update.message.reply_text(
-            "Available Commands:\n\n"
-            "▶️ /start - Restart bot interaction\n"
-            "➕ /adduser - Add allowed user\n"
-            "➖ /removeuser - Remove allowed user\n"
-            "👥 /userlist - Show all allowed users\n"
-            "🏓 /ping - Bot status\n"
-            "📜 /rules - Bot usage rules\n"
-            "♻️ /reset - Reset user data\n"
-            "🧹 /resetcaption - Reset your saved caption\n"
-            "🔁 /resetchannelid - Reset your channel ID\n"
-            "📡 /setchannelid - Set your Channel ID\n"
-            "✍️ /setcaption - Set your Caption"
+            "Available Commands:\n"
+            "/start - Restart bot interaction ▶️\n"
+            "/adduser - Add allowed user ➕\n"
+            "/removeuser - Remove allowed user ➖\n"
+            "/userlist - Show all allowed users 👥\n"
+            "/ping - Bot status 🏓\n"
+            "/rules - Bot usage rules 📜\n"
+            "/reset - Reset user data ♻️\n"
+            "/resetcaption - Reset your saved caption 🧹\n"
+            "/resetchannelid - Reset your channel ID 🔁\n"
+            "/setchannelid - Set your Channel ID 📡\n"
+            "/setcaption - Set your Caption ✍️"
         )
     elif user_id in ALLOWED_USERS:
         await update.message.reply_text(
-            "Available Commands:\n\n"
-            "▶️ /start - Restart bot interaction\n"
-            "🏓 /ping - Bot status\n"
-            "📜 /rules - Bot usage rules\n"
-            "♻️ /reset - Reset your data\n"
-            "🧹 /resetcaption - Reset your saved caption\n"
-            "🔁 /resetchannelid - Reset your channel ID\n"
-            "📡 /setchannelid - Set your Channel ID\n"
-            "✍️ /setcaption - Set your Caption"
+            "Available Commands:\n"
+            "/start - Restart bot interaction ▶️\n"
+            "/ping - Bot status 🏓\n"
+            "/rules - Bot usage rules 📜\n"
+            "/reset - Reset your data ♻️\n"
+            "/resetcaption - Reset your saved caption 🧹\n"
+            "/resetchannelid - Reset your channel ID 🔁\n"
+            "/setchannelid - Set your Channel ID 📡\n"
+            "/setcaption - Set your Caption ✍️"
         )
         
 async def add_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != OWNER_ID:
-        await update.message.reply_text("Access Denied.")
+        await update.message.reply_text("Access Denied. This command is for the boss only! 🚫👑")
         return
 
     if not context.args:
-        await update.message.reply_text("Usage: /adduser <user_id>")
+        await update.message.reply_text("Oops! You forgot to give a user ID. Try like this:\n`/adduser <user_id>` ✍️", parse_mode="Markdown")
         return
 
     try:
         user_id = int(context.args[0])
         ALLOWED_USERS.add(user_id)
         save_config()
-        await update.message.reply_text(f"User {user_id} AddeD Successfully")
+        await update.message.reply_text(f"✅ Boom! User `{user_id}` added successfully to the cool club! 🎉", parse_mode="Markdown")
     except ValueError:
-        await update.message.reply_text("Invalid user ID.")
+        await update.message.reply_text("Hmm... that doesn't look like a valid user ID. Try a number! 🔢")
 
 async def remove_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != OWNER_ID:
-        await update.message.reply_text("Access Denied.")
+        await update.message.reply_text("⛔ Access Denied. Only the boss can do this! 👑")
         return
 
     if not context.args:
-        await update.message.reply_text("Usage: /removeuser <user_id>")
+        await update.message.reply_text("📝 *Usage:* `/removeuser <user_id>`\nDon't leave me hanging!", parse_mode="Markdown")
         return
 
     try:
         user_id = int(context.args[0])
         ALLOWED_USERS.discard(user_id)
         save_config()
-        await update.message.reply_text(f"User {user_id} RemoveD Successfully")
+        await update.message.reply_text(
+            f"👋 *User* `{user_id}` *has been kicked out of the VIP list!* 🚪💨",
+            parse_mode="Markdown"
+        )
     except ValueError:
-        await update.message.reply_text("Invalid user ID.")
+        await update.message.reply_text("❌ That doesn't look like a valid user ID. Numbers only, please! 🔢")
 
 async def userlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != OWNER_ID:
@@ -202,71 +205,104 @@ async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_authorized(update.effective_user.id):
-        await update.message.reply_text("Access Denied.")
+        await update.message.reply_text("⛔ *Access Denied!* This area is off-limits. 🕵️‍♂️", parse_mode="Markdown")
         return
 
     await update.message.reply_text(
-        "🚫 Please avoid spamming the bot.\nViolations can lead to a ban without notice.\n\nFor support or feedback, contact: @Ceo_DarkFury"
+        "📜 *Bot Rules of Engagement:*\n\n"
+        "1️⃣ Please *don't spam* the bot — it's got feelings too! 🤖💔\n"
+        "2️⃣ Any violations may result in a *banhammer* drop without warning! 🔨🚫\n\n"
+        "💬 *Need help? Got feedback?*\nSlide into the DMs: [@Ceo_DarkFury](https://t.me/Ceo_DarkFury)",
+        parse_mode="Markdown"
     )
-
+    
 async def reset_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if not is_authorized(user_id):
-        await update.message.reply_text("Access Denied.")
+        await update.message.reply_text("⛔ *Access Denied!* You shall not pass! ⚔️", parse_mode="Markdown")
         return
 
     USER_DATA[str(user_id)]["caption"] = ""
     save_config()
-    await update.message.reply_text("Caption has been reset!")
-
+    await update.message.reply_text(
+        "🧼 *Your caption has been wiped clean!*\n"
+        "It's now as fresh as morning dew. 🌅✨\n\n"
+        "_Go ahead and set a new one when ready!_ 🎯",
+        parse_mode="Markdown"
+    )
+    
 async def reset_channel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if not is_authorized(user_id):
-        await update.message.reply_text("Access Denied.")
+        await update.message.reply_text("⛔ *Access Denied!* Nice try, but nope. 🚷", parse_mode="Markdown")
         return
 
     USER_DATA[str(user_id)]["channel"] = ""
     save_config()
-    await update.message.reply_text("Channel ID has been reset!")
-
+    await update.message.reply_text(
+        "📡 *Poof!* Your channel ID just vanished into the digital void! ✨\n"
+        "Feel free to set a shiny new one anytime! 🔧📲",
+        parse_mode="Markdown"
+    )
+    
 async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_authorized(update.effective_user.id):
-        await update.message.reply_text("Access Denied.")
+        await update.message.reply_text("⛔ *Access Denied!* You shall not pass! 🚷", parse_mode="Markdown")
         return
 
     for user_id in USER_DATA:
         USER_DATA[user_id]["channel"] = ""
         USER_DATA[user_id]["caption"] = ""
     save_config()
-    await update.message.reply_text("Reseted all Caption and Channel ID")
-
+    
+    await update.message.reply_text(
+        "♻️ *Boom!* All captions and channel IDs just got wiped cleaner than your browser history! ✨\n"
+        "Ready for a fresh start! ⚙️",
+        parse_mode="Markdown"
+    )
+    
 async def set_channel_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if not is_authorized(user_id):
-        await update.message.reply_text("Access Denied.")
+        await update.message.reply_text("⛔ *Access Denied!* You don’t have the keys to this kingdom! 🔐", parse_mode="Markdown")
         return
-    USER_STATE[user_id] = {"status": "waiting_channel"}
-    await update.message.reply_text("Please send your Channel ID (e.g., `@mychannel` or `-1001234567890`)", parse_mode="Markdown")
 
+    USER_STATE[user_id] = {"status": "waiting_channel"}
+    await update.message.reply_text(
+        "📡 *Channel Connection Time!*\n\n"
+        "Drop your Channel ID below, like:\n"
+        "`@yourchannelname` or `-1001234567890`\n\n"
+        "Let’s link it up like a Wi-Fi router! 🚀",
+        parse_mode="Markdown"
+    )
+    
 async def set_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if not is_authorized(user_id):
-        await update.message.reply_text("Access Denied.")
+        await update.message.reply_text("🚫 **Access Denied!** 😞", parse_mode="Markdown")
         return
+    
     USER_STATE[user_id] = {"status": "waiting_caption"}
-    await update.message.reply_text("Please send your Caption that includes `Key -`", parse_mode="Markdown")
-
+    
+    # Stylish and funny reply with emojis
+    await update.message.reply_text(
+        "✨🎉 Hey there! It's time to get creative! 🖌️🎨\n"
+        "Please send your **Caption** that includes `Key -` 🔑😎\n"
+        "Make it cool and unique! 💡😜",
+        parse_mode="Markdown"
+    )
+    
 async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if not is_authorized(user_id):
-        await update.message.reply_text("🚀𝗪𝗵𝗮𝘁 𝗕𝗿𝘂𝗵 , 𝗜𝘁❜𝘀 𝗩𝗲𝗿𝘆 𝗪𝗿𝗼𝗻𝗴 𝗕𝗿𝗼 😂")
+        await update.message.reply_text("🚀 *𝗪𝗵𝗮𝘁 𝗕𝗿𝘂𝗵!?* 😱 𝗜𝘁❜𝘀 𝗩𝗲𝗿𝘆 𝗪𝗿𝗼𝗻𝗴 𝗕𝗿𝗼 🤯🤣")
         return
 
     doc = update.message.document
     caption = update.message.caption or ""
 
     if not doc.file_name.endswith(".apk"):
-        await update.message.reply_text("Only APK files are supported.")
+        await update.message.reply_text("⚠️ **Only APK files are allowed!** 📦❌ Let's keep it real! 🔥")
         return
 
     match = re.search(r'Key\s*-\s*(\S+)', caption)
@@ -279,7 +315,8 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if not saved_caption or not channel_id:
             await update.message.reply_text(
-                "Please set both your *Caption* and *Channel ID* before sharing!\nUse /start and choose the options.",
+                "🚨 **Oops!** ⏳ You need to set both your *Caption* 📜 and *Channel ID* 📡 before sharing! 💥\n"
+                "Use /start and choose the options to set them up. 🛠️ Let's get ready to roll! 💪",
                 parse_mode="Markdown"
             )
             return
@@ -298,17 +335,21 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "status": "waiting_key"
         }
         await update.message.reply_text(
-            "Awesome! Now, please send the *Key* you want to attach.",
+            "🎉 **Nice!** Let's get the ball rolling! 🚀\n"
+            "Now, send the *Key* 🔑 you want to attach. 💫\n"
+            "We're almost there! 💥🔥",
             parse_mode="Markdown"
         )
         
 async def ask_to_share(update: Update):
     keyboard = [
-        [InlineKeyboardButton("Yes", callback_data="share_yes"),
-         InlineKeyboardButton("No", callback_data="share_no")]
+        [InlineKeyboardButton("✅ **Yes**", callback_data="share_yes"),
+         InlineKeyboardButton("❌ **No**", callback_data="share_no")]
     ]
     await update.message.reply_text(
-        "Do You Want To Share This To Your Channel?",
+        "✨ **Ready to share?** 🚀\n\n"
+        "Do you want to share this awesome content to your channel? 📲💥\n"
+        "Choose wisely! 😎👇",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
@@ -333,27 +374,27 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await userlist(update, context)
         return
     elif message_text == "on" and user_id == OWNER_ID:
-        await update.message.reply_text("Bot is now ON (placeholder status).")
+        await update.message.reply_text("✅ Bot is now *ON*. All systems go! 🚀", parse_mode="Markdown")
         return
     elif message_text == "off" and user_id == OWNER_ID:
-        await update.message.reply_text("Bot is now OFF (placeholder status).")
+        await update.message.reply_text("⛔ Bot is now *OFF*. Shutting down... 📴", parse_mode="Markdown")
         return
 
-    # EXISTING: Continue handling custom states
+    # STATE HANDLING
     state = USER_STATE.get(user_id)
-
     if not state:
         return
 
     if state["status"] == "waiting_key":
-        key = update.message.text
+        key = update.message.text.strip()
         caption = USER_DATA.get(str(user_id), {}).get("caption", "")
+        
         if "Key -" not in caption:
             await update.message.reply_text(
-    "Oops! Your saved caption doesn't contain the `Key -` placeholder.\n"
-    "Please update your caption using /start → 'Give me Your Caption'.",
-    parse_mode="Markdown"
-       )
+                "⚠️ *Oops!* Your saved caption doesn't contain the `Key -` placeholder.\n"
+                "Please update it using /start → *Give me Your Caption*.",
+                parse_mode="Markdown"
+            )
             return
 
         final_caption = caption.replace("Key -", f"`Key - {key}`")
@@ -368,18 +409,21 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         USER_DATA[str(user_id)] = USER_DATA.get(str(user_id), {})
         USER_DATA[str(user_id)]["channel"] = channel_id
         save_config()
-        await update.message.reply_text(f"Channel ID saved: {channel_id}")
+        await update.message.reply_text(f"📡 *Channel ID saved:* `{channel_id}`", parse_mode="Markdown")
         del USER_STATE[user_id]
 
     elif state["status"] == "waiting_caption":
         caption = update.message.text.strip()
         if "Key -" not in caption:
-            await update.message.reply_text("Invalid caption. You must include `Key -` as a placeholder.")
+            await update.message.reply_text(
+                "❌ *Invalid caption!*\nYour caption must include the placeholder `Key -`.",
+                parse_mode="Markdown"
+            )
         else:
             USER_DATA[str(user_id)] = USER_DATA.get(str(user_id), {})
             USER_DATA[str(user_id)]["caption"] = caption
             save_config()
-            await update.message.reply_text("Caption saved successfully!")
+            await update.message.reply_text("✅ *Caption saved successfully!* 📝", parse_mode="Markdown")
             del USER_STATE[user_id]
 
 async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -388,7 +432,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
 
     if user_id not in USER_STATE:
-        await query.edit_message_text("Session expired or invalid.")
+        await query.edit_message_text("⏳ *Session expired or invalid!* ❌\nPlease restart the process using /start.", parse_mode="Markdown")
         return
 
     data = query.data
@@ -397,7 +441,10 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if data == "share_yes":
         if not channel_id:
-            await query.edit_message_text("Channel ID not set. Use /start to set your channel.")
+            await query.edit_message_text(
+                "⚠️ *Channel ID not set!* 😬\nUse /start and select *Set Channel ID* to continue.",
+                parse_mode="Markdown"
+            )
             return
 
         await context.bot.send_document(
@@ -408,29 +455,28 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             disable_notification=True
         )
 
-        # Replace this part with your improved logic:
         if channel_id.startswith("@"):
             button = InlineKeyboardMarkup([
-                [InlineKeyboardButton("Go to Channel", url=f"https://t.me/{channel_id.strip('@')}")]
+                [InlineKeyboardButton("📡 Go to Channel", url=f"https://t.me/{channel_id.strip('@')}")]
             ])
-            await query.edit_message_text("View Your Channel", reply_markup=button)
+            await query.edit_message_text("✅ *Shared successfully!*\nCheck your post below! ⬇️", reply_markup=button, parse_mode="Markdown")
         else:
-            await query.edit_message_text("Shared successfully! (Private channel — no link shown)")
+            await query.edit_message_text("✅ *Shared successfully!* 🎉\n(Private channel — no link to show)", parse_mode="Markdown")
 
     elif data == "share_no":
-        await query.edit_message_text("No worries, retry the process.")
+        await query.edit_message_text("🙅‍♂️ *No worries!* You can retry anytime. Just drop your file again. 🚀", parse_mode="Markdown")
 
     elif data == "get_channel_id":
         USER_STATE[user_id] = {"status": "waiting_channel"}
         await query.edit_message_text(
-            "Please send your Channel ID (e.g., `@mychannel` or `-1001234567890`)",
+            "🔧 *Setup Time!* Send me your Channel ID now. 📡\nFormat: `@yourchannel` or `-100xxxxxxxxxx`",
             parse_mode="Markdown"
         )
 
     elif data == "get_caption":
         USER_STATE[user_id] = {"status": "waiting_caption"}
         await query.edit_message_text(
-            "Please send your Caption that includes `Key -`",
+            "📝 *Caption Time!*\nPlease send a caption that includes `Key -` as a placeholder. 🔑",
             parse_mode="Markdown"
         )
 
