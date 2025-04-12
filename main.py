@@ -22,6 +22,7 @@ USER_DATA = config["user_data"]
 
 START_TIME = time.time()
 USER_STATE = {}  # Tracks per-user upload state
+BOT_ACTIVE = True
 
 owner_keyboard = ReplyKeyboardMarkup(
     keyboard=[
@@ -53,6 +54,8 @@ def save_config():
         }, f, indent=4)
 
 def is_authorized(user_id: int) -> bool:
+    if not BOT_ACTIVE and user_id != OWNER_ID:
+        return False
     return user_id == OWNER_ID or user_id in ALLOWED_USERS
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -101,7 +104,9 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "/rules - Bot usage rules\n"
             "/reset - Reset user data\n"
             "/resetcaption - Reset your saved caption\n"
-            "/resetchannelid - Reset your channel ID"
+            "/resetchannelid - Reset your channel ID\n"
+            "/setchannelid - Set your Channel ID\n"
+            "/setcaption - Set your Caption"
         )
     elif user_id in ALLOWED_USERS:
         await update.message.reply_text(
@@ -111,7 +116,9 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "/rules - Bot usage rules\n"
             "/reset - Reset your data\n"
             "/resetcaption - Reset your saved caption\n"
-            "/resetchannelid - Reset your channel ID"
+            "/resetchannelid - Reset your channel ID\n"
+            "/setchannelid - Set your Channel ID\n"
+            "/setcaption - Set your Caption"
         )
         
 async def add_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -239,8 +246,29 @@ async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
     save_config()
     await update.message.reply_text("Reseted all Caption and Channel ID")
 
+async def set_channel_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    if not is_authorized(user_id):
+        await update.message.reply_text("Access Denied.")
+        return
+    USER_STATE[user_id] = {"status": "waiting_channel"}
+    await update.message.reply_text("Please send your Channel ID (e.g., `@mychannel` or `-1001234567890`)", parse_mode="Markdown")
+
+async def set_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    if not is_authorized(user_id):
+        await update.message.reply_text("Access Denied.")
+        return
+    USER_STATE[user_id] = {"status": "waiting_caption"}
+    await update.message.reply_text("Please send your Caption that includes `Key -`", parse_mode="Markdown")
+
 async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
+    
+    if not BOT_ACTIVE and user_id != OWNER_ID:
+        await update.message.reply_text("Bot is currently OFF. Please wait or contact the owner.")
+        return
+    
     if not is_authorized(user_id):
         await update.message.reply_text("🚀𝗪𝗵𝗮𝘁 𝗕𝗿𝘂𝗵 , 𝗜𝘁❜𝘀 𝗩𝗲𝗿𝘆 𝗪𝗿𝗼𝗻𝗴 𝗕𝗿𝗼 😂")
         return
@@ -298,6 +326,10 @@ async def ask_to_share(update: Update):
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     message_text = update.message.text.strip().lower()
+    
+    if not BOT_ACTIVE and user_id != OWNER_ID:
+        await update.message.reply_text("Bot is currently OFF. Please wait or contact the owner.")
+        return
 
     # BUTTON TEXT HANDLING
     if message_text == "ping":
@@ -315,11 +347,15 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif message_text == "userlist" and user_id == OWNER_ID:
         await userlist(update, context)
         return
-    elif message_text == "on" and user_id == OWNER_ID:
-        await update.message.reply_text("Bot is now ON (placeholder status).")
-        return
     elif message_text == "off" and user_id == OWNER_ID:
-        await update.message.reply_text("Bot is now OFF (placeholder status).")
+        global BOT_ACTIVE
+        BOT_ACTIVE = False
+        await update.message.reply_text("Bot is now OFF. All user features disabled.")
+        return
+    elif message_text == "on" and user_id == OWNER_ID:
+        global BOT_ACTIVE
+        BOT_ACTIVE = True
+        await update.message.reply_text("Bot is now ON. Users can access features.")
         return
 
     # EXISTING: Continue handling custom states
@@ -431,6 +467,8 @@ def main():
     app.add_handler(CommandHandler("resetcaption", reset_caption))
     app.add_handler(CommandHandler("resetchannelid", reset_channel))
     app.add_handler(CommandHandler("reset", reset))
+    app.add_handler(CommandHandler("setchannelid", set_channel_id))
+    app.add_handler(CommandHandler("setcaption", set_caption))
     app.add_handler(MessageHandler(filters.Document.ALL, handle_document))
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_text))
     app.add_handler(CallbackQueryHandler(handle_callback))
