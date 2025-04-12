@@ -104,7 +104,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "📤 <b>/resetchannelid</b> - Reset your channel ID\n"
             "🆔 <b>/setchannelid</b> - Set your Channel ID\n"
             "✏️ <b>/setcaption</b> - Set your Caption",
-            parse_mode=ParseMode.HTML
+            parse_mode=ParseMode."HTML"
         )
     elif user_id in ALLOWED_USERS:
         await update.message.reply_text(
@@ -117,42 +117,42 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "📤 <b>/resetchannelid</b> - Reset your channel ID\n"
             "🆔 <b>/setchannelid</b> - Set your Channel ID\n"
             "✏️ <b>/setcaption</b> - Set your Caption",
-            parse_mode=ParseMode.HTML
+            parse_mode=ParseMode."HTML"
         )
         
 async def add_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != OWNER_ID:
-        await update.message.reply_text("⛔️ <b>Access Denied</b>. Only the owner can use this command.", parse_mode=ParseMode.HTML)
+        await update.message.reply_text("⛔️ <b>Access Denied</b>. Only the owner can use this command.", parse_mode=ParseMode.""HTML")
         return
 
     if not context.args:
-        await update.message.reply_text("⚙️ <b>Usage:</b> /adduser &lt;user_id&gt;", parse_mode=ParseMode.HTML)
+        await update.message.reply_text("⚙️ <b>Usage:</b> /adduser &lt;user_id&gt;", parse_mode=ParseMode."HTML")
         return
 
     try:
         user_id = int(context.args[0])
         ALLOWED_USERS.add(user_id)
         save_config()
-        await update.message.reply_text(f"✅ <b>User {user_id}</b> has been <b>added successfully</b>!", parse_mode=ParseMode.HTML)
+        await update.message.reply_text(f"✅ <b>User {user_id}</b> has been <b>added successfully</b>!", parse_mode=ParseMode."HTML")
     except ValueError:
-        await update.message.reply_text("❌ <b>Invalid user ID</b>. Please enter a valid number.", parse_mode=ParseMode.HTML)
+        await update.message.reply_text("❌ <b>Invalid user ID</b>. Please enter a valid number.", parse_mode=ParseMode."HTML")
         
 async def remove_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != OWNER_ID:
-        await update.message.reply_text("⛔️ <b>Access Denied</b>. Only the owner can use this command.", parse_mode=ParseMode.HTML)
+        await update.message.reply_text("⛔️ <b>Access Denied</b>. Only the owner can use this command.", parse_mode=ParseMode."HTML")
         return
 
     if not context.args:
-        await update.message.reply_text("⚙️ <b>Usage:</b> /removeuser &lt;user_id&gt;", parse_mode=ParseMode.HTML)
+        await update.message.reply_text("⚙️ <b>Usage:</b> /removeuser &lt;user_id&gt;", parse_mode=ParseMode."HTML")
         return
 
     try:
         user_id = int(context.args[0])
         ALLOWED_USERS.discard(user_id)
         save_config()
-        await update.message.reply_text(f"✅ <b>User {user_id}</b> has been <b>removed successfully</b>!", parse_mode=ParseMode.HTML)
+        await update.message.reply_text(f"✅ <b>User {user_id}</b> has been <b>removed successfully</b>!", parse_mode=ParseMode."HTML")
     except ValueError:
-        await update.message.reply_text("❌ <b>Invalid user ID</b>. Please enter a valid number.", parse_mode=ParseMode.HTML)
+        await update.message.reply_text("❌ <b>Invalid user ID</b>. Please enter a valid number.", parse_mode=ParseMode."HTML")
 
 async def userlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != OWNER_ID:
@@ -204,7 +204,7 @@ async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_authorized(update.effective_user.id):
-        await update.message.reply_text("⛔️ <b>Access Denied</b>.", parse_mode=ParseMode.HTML)
+        await update.message.reply_text("⛔️ <b>Access Denied</b>.", parse_mode=ParseMode."HTML")
         return
 
     await update.message.reply_text(
@@ -212,13 +212,13 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "• No spamming\n"
         "• Violators may be banned without warning\n\n"
         "💬 <i>Need help?</i> Contact: <a href='https://t.me/Ceo_DarkFury'>@Ceo_DarkFury</a>",
-        parse_mode=ParseMode.HTML
+        parse_mode=ParseMode.'"HTML""
     )
 
 async def reset_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if not is_authorized(user_id):
-        await update.message.reply_text("⛔️ <b>Access Denied</b>.", parse_mode=ParseMode.HTML)
+        await update.message.reply_text("⛔️ <b>Access Denied</b>.", parse_mode=ParseMode."HTML")
         return
 
     USER_DATA[str(user_id)]["caption"] = ""
@@ -226,13 +226,13 @@ async def reset_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "✅ <b>Your caption has been successfully reset!</b>\n"
         "You can now set a new one with /setcaption.",
-        parse_mode=ParseMode.HTML
+        parse_mode=ParseMode."HTML"
     )
 
 async def reset_channel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if not is_authorized(user_id):
-        await update.message.reply_text("⛔️ <b>Access Denied</b>.", parse_mode=ParseMode.HTML)
+        await update.message.reply_text("⛔️ <b>Access Denied</b>.", parse_mode=ParseMode."HTML")
         return
 
     USER_DATA[str(user_id)]["channel"] = ""
@@ -240,12 +240,12 @@ async def reset_channel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "✅ <b>Your Channel ID has been successfully reset!</b>\n"
         "Use /setchannelid to add a new one.",
-        parse_mode=ParseMode.HTML
+        parse_mode=ParseMode."HTML"
     )
 
 async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_authorized(update.effective_user.id):
-        await update.message.reply_text("⛔️ <b>Access Denied</b>.", parse_mode=ParseMode.HTML)
+        await update.message.reply_text("⛔️ <b>Access Denied</b>.", parse_mode=ParseMode."HTML")
         return
 
     for user_id in USER_DATA:
@@ -256,13 +256,13 @@ async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "♻️ <b>Your Channel IDs and Captions have been successfully reset!</b>\n"
         "Start fresh and set them again when needed.",
-        parse_mode=ParseMode.HTML
+        parse_mode=ParseMode."HTML"
     )
     
 async def set_channel_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if not is_authorized(user_id):
-        await update.message.reply_text("⛔️ <b>Access Denied</b>.", parse_mode=ParseMode.HTML)
+        await update.message.reply_text("⛔️ <b>Access Denied</b>.", parse_mode=ParseMode."HTML")
         return
     USER_STATE[user_id] = {"status": "waiting_channel"}
     await update.message.reply_text(
