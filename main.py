@@ -222,8 +222,8 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Only APK files are supported.")
         return
 
-    if re.search(r'Key\s*-\s*(\S+)', caption):
     match = re.search(r'Key\s*-\s*(\S+)', caption)
+if match:
     key = match.group(1)
 
     saved_caption = USER_DATA.get(str(user_id), {}).get("caption", "")
@@ -238,13 +238,13 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "status": "confirm_share"
     }
     await ask_to_share(update)
-    else:
-        USER_STATE[user_id] = {
-            "file_id": doc.file_id,
-            "caption": "",  # To be filled
-            "status": "waiting_key"
-        }
-        await update.message.reply_text("Awesome! Now, please send the *Key* you want to attach.", parse_mode="Markdown")
+else:
+    USER_STATE[user_id] = {
+        "file_id": doc.file_id,
+        "caption": "",  # To be filled
+        "status": "waiting_key"
+    }
+    await update.message.reply_text("Awesome! Now, please send the *Key* you want to attach.", parse_mode="Markdown")
 
 async def ask_to_share(update: Update):
     keyboard = [
