@@ -161,7 +161,7 @@ async def userlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("No allowed users.")
         return
 
-    lines = ["**👥 Allowed Users List:**"]
+    lines = ["👥 <b>Allowed Users List:</b>"]
     for user_id in ALLOWED_USERS:
         user_data = USER_DATA.get(str(user_id), {})
 
@@ -171,16 +171,16 @@ async def userlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         user_line = (
             "━━━━━━━━━━━━━━━━━━━━\n"
-            f"**👤NickName** : {nickname if nickname else '—'}\n"
-            f"**👽Username** : {'@' + username if username else '—'}\n"
-            f"**🌝UserChannel** : {channel if channel else '—'}\n"
-            f"**🗣️UserID** : [Click Here](tg://openmessage?user_id={user_id})\n"
+            f"<b>👤NickName</b> : {nickname if nickname else '—'}\n"
+            f"<b>👽Username</b> : {'@' + username if username else '—'}\n"
+            f"<b>🌝UserChannel</b> : {channel if channel else '—'}\n"
+            f"<b>🗣️UserID</b> : <a href=\"tg://openmessage?user_id={user_id}\">Click Here</a>\n"
             "━━━━━━━━━━━━━━━━━━━━"
         )
         lines.append(user_line)
 
-    await update.message.reply_text("\n".join(lines), parse_mode="Markdown")
-
+    await update.message.reply_text("\n".join(lines), parse_mode="HTML")
+    
 async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_authorized(update.effective_user.id):
         await update.message.reply_text("Access Denied.")
