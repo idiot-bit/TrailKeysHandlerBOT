@@ -355,7 +355,6 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     message_text = update.message.text.strip().lower()
 
-    # BUTTON TEXT HANDLING
     if message_text == "ping":
         await ping(update, context)
         return
@@ -378,7 +377,6 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("⚠️ <b>Bot is now OFF</b> (status placeholder).", parse_mode="HTML")
         return
 
-    # EXISTING: Continue handling custom states
     state = USER_STATE.get(user_id)
     if not state:
         return
@@ -457,8 +455,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode="HTML",
             disable_notification=True
         )
-
-        # Response based on channel type
+        
         if channel_id.startswith("@"):
             button = InlineKeyboardMarkup([
                 [InlineKeyboardButton("🔗 Go to Channel", url=f"https://t.me/{channel_id.strip('@')}")]
@@ -484,8 +481,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode="HTML"
         )
 
-# You’ll add other handlers here...
-
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
@@ -501,4 +496,10 @@ def main():
     app.add_handler(CommandHandler("setchannelid", set_channel_id))
     app.add_handler(CommandHandler("setcaption", set_caption))
     app.add_handler(MessageHandler(filters.Document.ALL, handle_document))
-    app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_text)
+    app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_text))
+    app.add_handler(CallbackQueryHandler(handle_callback))
+
+    app.run_polling()
+
+if __name__ == "__main__":
+    main()
