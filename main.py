@@ -253,7 +253,7 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     match = re.search(r'Key\s*-\s*(\S+)', caption)
-    if match:
+if match:
     key = match.group(1)
 
     user_info = USER_DATA.get(str(user_id), {})
