@@ -92,30 +92,30 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if user_id == OWNER_ID:
         await update.message.reply_text(
-            "Available Commands:\n"
-            "/start - Restart bot interaction\n"
-            "/adduser - Add allowed user\n"
-            "/removeuser - Remove allowed user\n"
-            "/userlist - Show all allowed users\n"
-            "/ping - Bot status\n"
-            "/rules - Bot usage rules\n"
-            "/reset - Reset user data\n"
-            "/resetcaption - Reset your saved caption\n"
-            "/resetchannelid - Reset your channel ID\n"
-            "/setchannelid - Set your Channel ID\n"
-            "/setcaption - Set your Caption"
+            "Available Commands:\n\n"
+            "▶️ /start - Restart bot interaction\n"
+            "➕ /adduser - Add allowed user\n"
+            "➖ /removeuser - Remove allowed user\n"
+            "👥 /userlist - Show all allowed users\n"
+            "🏓 /ping - Bot status\n"
+            "📜 /rules - Bot usage rules\n"
+            "♻️ /reset - Reset user data\n"
+            "🧹 /resetcaption - Reset your saved caption\n"
+            "🔁 /resetchannelid - Reset your channel ID\n"
+            "📡 /setchannelid - Set your Channel ID\n"
+            "✍️ /setcaption - Set your Caption"
         )
     elif user_id in ALLOWED_USERS:
         await update.message.reply_text(
-            "Available Commands:\n"
-            "/start - Restart bot interaction\n"
-            "/ping - Bot status\n"
-            "/rules - Bot usage rules\n"
-            "/reset - Reset your data\n"
-            "/resetcaption - Reset your saved caption\n"
-            "/resetchannelid - Reset your channel ID\n"
-            "/setchannelid - Set your Channel ID\n"
-            "/setcaption - Set your Caption"
+            "Available Commands:\n\n"
+            "▶️ /start - Restart bot interaction\n"
+            "🏓 /ping - Bot status\n"
+            "📜 /rules - Bot usage rules\n"
+            "♻️ /reset - Reset your data\n"
+            "🧹 /resetcaption - Reset your saved caption\n"
+            "🔁 /resetchannelid - Reset your channel ID\n"
+            "📡 /setchannelid - Set your Channel ID\n"
+            "✍️ /setcaption - Set your Caption"
         )
         
 async def add_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
