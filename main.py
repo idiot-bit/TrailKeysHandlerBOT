@@ -236,12 +236,31 @@ async def ask_to_share(update: Update):
 
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
+    message_text = update.message.text.strip().lower()
+
+    # BUTTON TEXT HANDLING
+    if message_text == "ping":
+        await ping(update, context)
+        return
+    elif message_text == "help":
+        await help_command(update, context)
+        return
+    elif message_text == "rules":
+        await rules(update, context)
+        return
+    elif message_text == "reset":
+        await reset(update, context)
+        return
+    elif message_text == "userlist" and user_id == OWNER_ID:
+        await userlist(update, context)
+        return
+
+    # EXISTING: Continue handling custom states
     state = USER_STATE.get(user_id)
 
     if not state:
         return
 
-    # EXISTING: Handling when waiting for a key
     if state["status"] == "waiting_key":
         key = update.message.text
         caption = USER_DATA.get(str(user_id), {}).get("caption", "")
@@ -254,10 +273,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "caption": final_caption,
             "status": "confirm_share"
         })
-
         await ask_to_share(update)
-
-    # >>> ADD THIS BELOW waiting_key BLOCK <<<
 
     elif state["status"] == "waiting_channel":
         channel_id = update.message.text.strip()
