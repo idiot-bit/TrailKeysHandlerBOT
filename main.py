@@ -326,9 +326,9 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data in ["get_channel_id", "get_caption"]:
     # Bypass state check for these two actions
     pass
-      elif user_id not in USER_STATE:
-          await query.edit_message_text("Session expired or invalid.")
-          return
+elif user_id not in USER_STATE:
+    await query.edit_message_text("Session expired or invalid.")
+    return
 
     data = query.data
     state = USER_STATE[user_id]
