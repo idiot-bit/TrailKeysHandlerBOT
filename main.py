@@ -258,7 +258,7 @@ async def reset_channel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
 async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_authorized(update.effective_user.id):
-        await update.message.reply_text("🗣️𝖮𝗈𝗆𝖻𝗎𝗎𝗎)
+        await update.message.reply_text("🗣️𝖮𝗈𝗆𝖻𝗎𝗎𝗎")
         return
 
     for user_id in USER_DATA:
