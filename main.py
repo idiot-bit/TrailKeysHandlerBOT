@@ -161,25 +161,23 @@ async def userlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("No allowed users.")
         return
 
-    lines = ["👥 <b>Allowed Users List:</b>"]
-    for user_id in ALLOWED_USERS:
+    lines = [f"🧾 <b>Total Allowed Users:</b> {len(ALLOWED_USERS)}\n"]
+    for index, user_id in enumerate(ALLOWED_USERS, start=1):
         user_data = USER_DATA.get(str(user_id), {})
+        nickname = user_data.get("first_name", "—")
+        username = user_data.get("username", "—")
+        channel = user_data.get("channel", "—")
 
-        nickname = user_data.get("first_name")
-        username = user_data.get("username")
-        channel = user_data.get("channel")
-
-        user_line = (
-            "━━━━━━━━━━━━━━━━━━━━\n"
-            f"<b>👤NickName</b> : {nickname if nickname else '—'}\n"
-            f"<b>👽Username</b> : {'@' + username if username else '—'}\n"
-            f"<b>🌝UserChannel</b> : {channel if channel else '—'}\n"
-            f"<b>🗣️UserID</b> : <a href=\"tg://openmessage?user_id={user_id}\">Click Here</a>\n"
+        lines.append(
+            f"📌 <b>User {index}</b>\n"
+            f"├─ 👤 <b>Name:</b> {nickname}\n"
+            f"├─ 🧬 <b>Username:</b> {'@' + username if username != '—' else '—'}\n"
+            f"├─ 📡 <b>Channel:</b> {channel}\n"
+            f"└─ 🆔 <b>ID:</b> <a href=\"tg://openmessage?user_id={user_id}\">{user_id}</a>\n"
             "━━━━━━━━━━━━━━━━━━━━"
         )
-        lines.append(user_line)
 
-    await update.message.reply_text("\n".join(lines), parse_mode="HTML")
+    await update.message.reply_text("\n".join(lines), parse_mode="HTML", disable_web_page_preview=True)
     
 async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_authorized(update.effective_user.id):
@@ -192,16 +190,15 @@ async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
     minutes, seconds = divmod(remainder, 60)
 
     ping_ms = round(random.uniform(10, 80), 2)
-    today = datetime.datetime.now().strftime("%d/%m/%Y")
+    today = datetime.datetime.now().strftime("%d:%m:%Y")
 
     msg = (
-        "╭━━⪩ Server Status ⪨━━╮\n"
-        f"┣⪧ Date : {today}\n"
-        f"┣⪧ Uptime : {days}D {hours}H {minutes}M {seconds}S\n"
-        f"┣⪧ Ping : {ping_ms} ms\n"
-        "╰━━━━━━━━━━━━━━━╯"
+        "🏓 <b>𝗣𝗼𝗻𝗴!</b>\n\n"
+        f"    📅 <b>Update:</b> {today}\n"
+        f"    ⏳ <b>Uptime:</b> {days}D : {hours}H : {minutes}M : {seconds}S\n"
+        f"    ⚡ <b>Ping:</b> {ping_ms} ms"
     )
-    await update.message.reply_text(msg)
+    await update.message.reply_text(msg, parse_mode="HTML")
 
 async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_authorized(update.effective_user.id):
