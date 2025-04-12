@@ -212,7 +212,7 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "• No spamming\n"
         "• Violators may be banned without warning\n\n"
         "💬 <i>Need help?</i> Contact: <a href='https://t.me/Ceo_DarkFury'>@Ceo_DarkFury</a>",
-        parse_mode=ParseMode.'"HTML"
+        parse_mode=ParseMode."HTML"
     )
 
 async def reset_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
