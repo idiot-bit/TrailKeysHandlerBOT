@@ -328,6 +328,13 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     user_id = update.effective_user.id
     message_text = update.message.text.strip().lower()
+    if user_id = OWNER_ID:
+        await update.message.reply_text("Only the bot owner can turn the bot ON or OFF.")
+        return
+    BOT_ACTIVE = message_text == "on"
+    status = "ON" if BOT_ACTIVE else "OFF"
+    await update.message.reply_text(f"Bot is now {status}.")
+    return
     
     # BUTTON TEXT HANDLING
     if message_text == "ping":
@@ -346,14 +353,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await userlist(update, context)
         return
     elif message_text in ("on", "off"):
-    if user_id = OWNER_ID:
-        await update.message.reply_text("Only the bot owner can turn the bot ON or OFF.")
-        return
-    BOT_ACTIVE = message_text == "on"
-    status = "ON" if BOT_ACTIVE else "OFF"
-    await update.message.reply_text(f"Bot is now {status}.")
-    return
-
+    
     # EXISTING: Continue handling custom states
     state = USER_STATE.get(user_id)
 
