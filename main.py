@@ -335,15 +335,11 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif message_text == "userlist" and user_id == OWNER_ID:
         await userlist(update, context)
         return
-    elif message_text == "off" and user_id == OWNER_ID:
-        global BOT_ACTIVE
-        BOT_ACTIVE = False
-        await update.message.reply_text("Bot is now OFF. All user features disabled.")
-        return
     elif message_text == "on" and user_id == OWNER_ID:
-        global BOT_ACTIVE
-        BOT_ACTIVE = True
-        await update.message.reply_text("Bot is now ON. Users can access features.")
+        await update.message.reply_text("Bot is now ON (placeholder status).")
+        return
+    elif message_text == "off" and user_id == OWNER_ID:
+        await update.message.reply_text("Bot is now OFF (placeholder status).")
         return
 
     # EXISTING: Continue handling custom states
