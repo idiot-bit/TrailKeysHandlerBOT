@@ -122,7 +122,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
 async def add_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != OWNER_ID:
-        await update.message.reply_text("⛔️ <b>Access Denied</b>. Only the owner can use this command.", parse_mode=ParseMode.""HTML")
+        await update.message.reply_text("⛔️ <b>Access Denied</b>. Only the owner can use this command.", parse_mode=ParseMode."HTML")
         return
 
     if not context.args:
@@ -212,7 +212,7 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "• No spamming\n"
         "• Violators may be banned without warning\n\n"
         "💬 <i>Need help?</i> Contact: <a href='https://t.me/Ceo_DarkFury'>@Ceo_DarkFury</a>",
-        parse_mode=ParseMode.'"HTML""
+        parse_mode=ParseMode.'"HTML"
     )
 
 async def reset_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
