@@ -336,9 +336,9 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "status": "waiting_key"
         }
         await update.message.reply_text(
-            "👋 *Hey Buddy!* 🤖\n\n"
+            "👋 *Hey Buddy!* 🤖\n"
             "You must set up our bot first before sending an APK! 📦\n"
-            "Set your:\n- /setchannelid 📡\n- /setcaption 📝\n\nThen send your APK file! 🚀"
+            "Set your:\n- /setchannelid 📡\n- /setcaption 📝\n- Then send your APK file! 🚀",
             parse_mode="Markdown"
         )
         
