@@ -361,7 +361,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode="Markdown"
         )
 
-    elif data == "get_caption":
+elif data == "get_caption":
     if USER_DATA.get(str(user_id), {}).get("caption"):
         await query.edit_message_text(
             "You’ve already set your Caption.\nUse /resetcaption to change it."
