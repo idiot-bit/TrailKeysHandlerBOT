@@ -22,6 +22,24 @@ USER_DATA = config["user_data"]
 START_TIME = time.time()
 USER_STATE = {}  # Tracks per-user upload state
 
+owner_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton("Userlist"), KeyboardButton("Help")],
+        [KeyboardButton("Ping"), KeyboardButton("Rules")],
+        [KeyboardButton("Reset")]
+    ],
+    resize_keyboard=True
+)
+
+allowed_user_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton("Help")],
+        [KeyboardButton("Ping"), KeyboardButton("Rules")],
+        [KeyboardButton("Reset")]
+    ],
+    resize_keyboard=True
+)
+
 def save_config():
     with open("config.json", "w") as f:
         json.dump({
@@ -39,20 +57,40 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("🚀𝗪𝗵𝗮𝘁 𝗕𝗿𝘂𝗵 , 𝗜𝘁❜𝘀 𝗩𝗲𝗿𝘆 𝗪𝗿𝗼𝗻𝗴 𝗕𝗿𝗼 😂")
         return
 
-    keyboard = [
+    inline_keyboard = [
         [InlineKeyboardButton("Add me to Your Channel", url="https://t.me/TrailKeysHandlerBOT?startchannel=true")],
         [InlineKeyboardButton("Give me Your Channel ID", callback_data="get_channel_id")],
         [InlineKeyboardButton("Give me Your Caption", callback_data="get_caption")]
     ]
+
+    reply_kb = owner_keyboard if user_id == OWNER_ID else allowed_user_keyboard
+
     await update.message.reply_text(
         "Hey Buddy How Are You ?\n/help to find your solution !",
-        reply_markup=InlineKeyboardMarkup(keyboard)
+        reply_markup=InlineKeyboardMarkup(inline_keyboard)
     )
+    await update.message.reply_text("Main Menu Loaded", reply_markup=reply_kb)
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if is_authorized(update.effective_user.id):
-        await update.message.reply_text("Help:\n/start\n/adduser\n/removeuser\n/userlist\n/ping\n/rules\n/reset")
-
+    user_id = update.effective_user.id
+    if user_id == OWNER_ID:
+        await update.message.reply_text(
+            "Available Commands:\n"
+            "/adduser - Add allowed user\n"
+            "/removeuser - Remove allowed user\n"
+            "/userlist - Show all allowed users\n"
+            "/ping - Bot status\n"
+            "/rules - Bot usage rules\n"
+            "/reset - Reset user data"
+        )
+    elif user_id in ALLOWED_USERS:
+        await update.message.reply_text(
+            "Available Commands:\n"
+            "/ping - Bot status\n"
+            "/rules - Bot usage rules\n"
+            "/reset - Reset your data"
+        )
+        
 async def add_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != OWNER_ID:
         await update.message.reply_text("Access Denied.")
@@ -102,8 +140,16 @@ async def userlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
         nickname = user_data.get("first_name", "N/A")
         username = user_data.get("username", "N/A")
         channel = user_data.get("channel", "N/A")
-        link = f"[{user_id}](tg://openmessage?user_id={user_id})"
-        lines.append(f"NickName: {nickname}\nUsername: @{username}\nUserChannel: {channel}\nUser ID: {link}\n")
+        link = f"[Click Here](tg://user?id={user_id})"
+
+        lines.append(
+            "━━━━━━━━━━━━━━━━━━━━\n"
+            f"NickName : {nickname}\n"
+            f"Username : @{username}\n"
+            f"UserChannel : {channel}\n"
+            f"UserID : {link}\n"
+            "━━━━━━━━━━━━━━━━━━━━"
+        )
 
     await update.message.reply_text("\n".join(lines), parse_mode="Markdown")
 
@@ -118,13 +164,16 @@ async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
     minutes, seconds = divmod(remainder, 60)
 
     ping_ms = round(random.uniform(10, 80), 2)
+    today = datetime.datetime.now().strftime("%d/%m/%Y")
 
-    today = datetime.datetime.now().strftime("%d : %m : %Y")
-    await update.message.reply_text(
-        f"Update - {today}\n"
-        f"Uptime - {days} : {hours} : {minutes} : {seconds}\n"
-        f"Ping - {ping_ms:.2f} ms"
+    msg = (
+        "╭━━⪩ Server Status ⪨━━╮\n"
+        f"┣⪧ Date : {today}\n"
+        f"┣⪧ Uptime : {days}D {hours}H {minutes}M {seconds}S\n"
+        f"┣⪧ Ping : {ping_ms} ms\n"
+        "╰━━━━━━━━━━━━━━━╯"
     )
+    await update.message.reply_text(msg)
 
 async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_authorized(update.effective_user.id):
