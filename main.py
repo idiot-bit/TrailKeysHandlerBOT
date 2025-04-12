@@ -27,7 +27,8 @@ owner_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton("Userlist"), KeyboardButton("Help")],
         [KeyboardButton("Ping"), KeyboardButton("Rules")],
-        [KeyboardButton("Reset")]
+        [KeyboardButton("Reset")],
+        [KeyboardButton("On"), KeyboardButton("Off")]
     ],
     resize_keyboard=True,
     one_time_keyboard=False
@@ -98,8 +99,9 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "/userlist - Show all allowed users\n"
             "/ping - Bot status\n"
             "/rules - Bot usage rules\n"
-            "/reset - Reset user data"
-            "Available Commands:\n"
+            "/reset - Reset user data\n"
+            "/resetcaption - Reset your saved caption\n"
+            "/resetchannelid - Reset your channel ID"
         )
     elif user_id in ALLOWED_USERS:
         await update.message.reply_text(
@@ -107,7 +109,9 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "/start - Restart bot interaction\n"
             "/ping - Bot status\n"
             "/rules - Bot usage rules\n"
-            "/reset - Reset your data"
+            "/reset - Reset your data\n"
+            "/resetcaption - Reset your saved caption\n"
+            "/resetchannelid - Reset your channel ID"
         )
         
 async def add_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -204,6 +208,26 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "🚫 Please avoid spamming the bot.\nViolations can lead to a ban without notice.\n\nFor support or feedback, contact: @Ceo_DarkFury"
     )
 
+async def reset_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    if not is_authorized(user_id):
+        await update.message.reply_text("Access Denied.")
+        return
+
+    USER_DATA[str(user_id)]["caption"] = ""
+    save_config()
+    await update.message.reply_text("Caption has been reset!")
+
+async def reset_channel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    if not is_authorized(user_id):
+        await update.message.reply_text("Access Denied.")
+        return
+
+    USER_DATA[str(user_id)]["channel"] = ""
+    save_config()
+    await update.message.reply_text("Channel ID has been reset!")
+
 async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_authorized(update.effective_user.id):
         await update.message.reply_text("Access Denied.")
@@ -230,20 +254,27 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     match = re.search(r'Key\s*-\s*(\S+)', caption)
     if match:
-        key = match.group(1)
+    key = match.group(1)
 
-        saved_caption = USER_DATA.get(str(user_id), {}).get("caption", "")
-        if "Key -" in saved_caption:
-            final_caption = saved_caption.replace("Key -", f"`Key - {key}`")
-        else:
-            final_caption = caption
+    user_info = USER_DATA.get(str(user_id), {})
+    saved_caption = user_info.get("caption", "")
+    channel_id = user_info.get("channel", "")
 
-        USER_STATE[user_id] = {
-            "file_id": doc.file_id,
-            "caption": final_caption,
-            "status": "confirm_share"
-        }
-        await ask_to_share(update)
+    if not saved_caption or not channel_id:
+        await update.message.reply_text(
+            "Please set both your *Caption* and *Channel ID* before sharing!\nUse /start and choose the options.",
+            parse_mode="Markdown"
+        )
+        return
+
+    final_caption = saved_caption.replace("Key -", f"`Key - {key}`")
+    USER_STATE[user_id] = {
+        "file_id": doc.file_id,
+        "caption": final_caption,
+        "status": "confirm_share"
+    }
+    await ask_to_share(update)
+    
     else:
         USER_STATE[user_id] = {
             "file_id": doc.file_id,
@@ -281,6 +312,12 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     elif message_text == "userlist" and user_id == OWNER_ID:
         await userlist(update, context)
+        return
+    elif message_text == "on" and user_id == OWNER_ID:
+        await update.message.reply_text("Bot is now ON (placeholder status).")
+        return
+    elif message_text == "off" and user_id == OWNER_ID:
+        await update.message.reply_text("Bot is now OFF (placeholder status).")
         return
 
     # EXISTING: Continue handling custom states
@@ -348,16 +385,18 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=channel_id,
             document=state["file_id"],
             caption=state["caption"],
-            parse_mode="Markdown",  # <-- ADD THIS
+            parse_mode="Markdown",
             disable_notification=True
         )
 
-        await query.edit_message_text(
-            "View Your Channel",
-            reply_markup=InlineKeyboardMarkup([
+        # Replace this part with your improved logic:
+        if channel_id.startswith("@"):
+            button = InlineKeyboardMarkup([
                 [InlineKeyboardButton("Go to Channel", url=f"https://t.me/{channel_id.strip('@')}")]
             ])
-        )
+            await query.edit_message_text("View Your Channel", reply_markup=button)
+        else:
+            await query.edit_message_text("Shared successfully! (Private channel — no link shown)")
 
     elif data == "share_no":
         await query.edit_message_text("No worries, retry the process.")
@@ -387,6 +426,8 @@ def main():
     app.add_handler(CommandHandler("userlist", userlist))
     app.add_handler(CommandHandler("ping", ping))
     app.add_handler(CommandHandler("rules", rules))
+    app.add_handler(CommandHandler("resetcaption", reset_caption))
+    app.add_handler(CommandHandler("resetchannelid", reset_channel))
     app.add_handler(CommandHandler("reset", reset))
     app.add_handler(MessageHandler(filters.Document.ALL, handle_document))
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_text))
