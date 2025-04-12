@@ -346,7 +346,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await userlist(update, context)
         return
     elif message_text in ("on", "off"):
-    if user_id != OWNER_ID:
+    if user_id = OWNER_ID:
         await update.message.reply_text("Only the bot owner can turn the bot ON or OFF.")
         return
     BOT_ACTIVE = message_text == "on"
