@@ -322,11 +322,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     user_id = query.from_user.id
-
-    if query.data not in ["get_channel_id", "get_caption"] and user_id not in USER_STATE:
-    await query.edit_message_text("Session expired or invalid.")
-    return
-
+    
     data = query.data
     state = USER_STATE[user_id]
     channel_id = USER_DATA.get(str(user_id), {}).get("channel")
