@@ -24,7 +24,6 @@ START_TIME = time.time()
 USER_STATE = {}  # Tracks per-user upload state
 
 owner_keyboard = ReplyKeyboardMarkup(
-owner_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton("Userlist"), KeyboardButton("Help")],
         [KeyboardButton("Ping"), KeyboardButton("Rules")],
@@ -42,20 +41,6 @@ allowed_user_keyboard = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True,
     one_time_keyboard=False
-)
-
-allowed_user_keyboard = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton("Help")],
-        [KeyboardButton("Ping"), KeyboardButton("Rules")],
-        [KeyboardButton("Reset")]
-    ],
-    resize_keyboard=True
-)ton("Help")],
-        [KeyboardButton("Ping"), KeyboardButton("Rules")],
-        [KeyboardButton("Reset")]
-    ],
-    resize_keyboard=True
 )
 
 def save_config():
@@ -101,7 +86,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Choose an action below to get started:",
         reply_markup=InlineKeyboardMarkup(inline_keyboard)
     )
-    
+
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if user_id == OWNER_ID:
