@@ -274,14 +274,14 @@ if match:
         "status": "confirm_share"
     }
     await ask_to_share(update)
-    
-    else:
-        USER_STATE[user_id] = {
-            "file_id": doc.file_id,
-            "caption": "",  # To be filled
-            "status": "waiting_key"
-        }
-        await update.message.reply_text("Awesome! Now, please send the *Key* you want to attach.", parse_mode="Markdown")
+
+else:
+    USER_STATE[user_id] = {
+        "file_id": doc.file_id,
+        "caption": "",  # To be filled
+        "status": "waiting_key"
+    }
+    await update.message.reply_text("Awesome! Now, please send the *Key* you want to attach.", parse_mode="Markdown")
         
 async def ask_to_share(update: Update):
     keyboard = [
