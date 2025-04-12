@@ -58,8 +58,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("🚀𝗪𝗵𝗮𝘁 𝗕𝗿𝘂𝗵 , 𝗜𝘁❜𝘀 𝗩𝗲𝗿𝘆 𝗪𝗿𝗼𝗻𝗴 𝗕𝗿𝗼 😂")
         return
 
-# Save basic user data (first name, username)
-USER_DATA[str(user_id)] = {
+    # Save basic user data (first name, username)
+    USER_DATA[str(user_id)] = {
         "first_name": update.effective_user.first_name,
         "username": update.effective_user.username,
         "channel": USER_DATA.get(str(user_id), {}).get("channel", ""),
