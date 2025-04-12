@@ -26,8 +26,7 @@ owner_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton("Userlist"), KeyboardButton("Help")],
         [KeyboardButton("Ping"), KeyboardButton("Rules")],
-        [KeyboardButton("Reset"), KeyboardButton("/resetcaption")],
-        [KeyboardButton("/resetchennalid")]
+        [KeyboardButton("Reset")]
     ],
     resize_keyboard=True
 )
@@ -36,8 +35,7 @@ allowed_user_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton("Help")],
         [KeyboardButton("Ping"), KeyboardButton("Rules")],
-        [KeyboardButton("Reset"), KeyboardButton("/resetcaption")],
-        [KeyboardButton("/resetchennalid")]
+        [KeyboardButton("Reset")]
     ],
     resize_keyboard=True
 )
@@ -198,28 +196,6 @@ async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
     save_config()
     await update.message.reply_text("Reseted all Caption and Channel ID")
 
-async def reset_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    if not is_authorized(user_id):
-        await update.message.reply_text("Access Denied.")
-        return
-
-    USER_DATA[str(user_id)] = USER_DATA.get(str(user_id), {})
-    USER_DATA[str(user_id)]["caption"] = ""
-    save_config()
-    await update.message.reply_text("Your caption has been reset. Use 'Give me Your Caption' again.")
-
-async def reset_channel(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    if not is_authorized(user_id):
-        await update.message.reply_text("Access Denied.")
-        return
-
-    USER_DATA[str(user_id)] = USER_DATA.get(str(user_id), {})
-    USER_DATA[str(user_id)]["channel"] = ""
-    save_config()
-    await update.message.reply_text("Your channel ID has been reset. Use 'Give me Your Channel ID' again.")
-
 async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if not is_authorized(user_id):
@@ -260,31 +236,12 @@ async def ask_to_share(update: Update):
 
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-    message_text = update.message.text.strip().lower()
-
-    # BUTTON TEXT HANDLING
-    if message_text == "ping":
-        await ping(update, context)
-        return
-    elif message_text == "help":
-        await help_command(update, context)
-        return
-    elif message_text == "rules":
-        await rules(update, context)
-        return
-    elif message_text == "reset":
-        await reset(update, context)
-        return
-    elif message_text == "userlist" and user_id == OWNER_ID:
-        await userlist(update, context)
-        return
-
-    # EXISTING: Continue handling custom states
     state = USER_STATE.get(user_id)
 
     if not state:
         return
 
+    # EXISTING: Handling when waiting for a key
     if state["status"] == "waiting_key":
         key = update.message.text
         caption = USER_DATA.get(str(user_id), {}).get("caption", "")
@@ -297,7 +254,10 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "caption": final_caption,
             "status": "confirm_share"
         })
+
         await ask_to_share(update)
+
+    # >>> ADD THIS BELOW waiting_key BLOCK <<<
 
     elif state["status"] == "waiting_channel":
         channel_id = update.message.text.strip()
@@ -322,7 +282,11 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     user_id = query.from_user.id
-    
+
+    if user_id not in USER_STATE:
+        await query.edit_message_text("Session expired or invalid.")
+        return
+
     data = query.data
     state = USER_STATE[user_id]
     channel_id = USER_DATA.get(str(user_id), {}).get("channel")
@@ -350,23 +314,13 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text("No worries, retry the process.")
 
     elif data == "get_channel_id":
-    if USER_DATA.get(str(user_id), {}).get("channel"):
-        await query.edit_message_text(
-            "You’ve already set your Channel ID.\nUse /resetchennalid to change it."
-        )
-    else:
         USER_STATE[user_id] = {"status": "waiting_channel"}
         await query.edit_message_text(
             "Please send your Channel ID (e.g., `@mychannel` or `-1001234567890`)",
             parse_mode="Markdown"
         )
 
-elif data == "get_caption":
-    if USER_DATA.get(str(user_id), {}).get("caption"):
-        await query.edit_message_text(
-            "You’ve already set your Caption.\nUse /resetcaption to change it."
-        )
-    else:
+    elif data == "get_caption":
         USER_STATE[user_id] = {"status": "waiting_caption"}
         await query.edit_message_text(
             "Please send your Caption that includes `Key -`",
@@ -388,8 +342,6 @@ def main():
     app.add_handler(MessageHandler(filters.Document.ALL, handle_document))
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_text))
     app.add_handler(CallbackQueryHandler(handle_callback))
-    app.add_handler(CommandHandler("resetcaption", reset_caption))
-    app.add_handler(CommandHandler("resetchennalid", reset_channel))
 
     app.run_polling()
 
