@@ -24,17 +24,34 @@ START_TIME = time.time()
 USER_STATE = {}  # Tracks per-user upload state
 
 owner_keyboard = ReplyKeyboardMarkup(
+owner_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton("Userlist"), KeyboardButton("Help")],
         [KeyboardButton("Ping"), KeyboardButton("Rules")],
         [KeyboardButton("Reset")]
     ],
-    resize_keyboard=True
+    resize_keyboard=True,
+    one_time_keyboard=False
 )
 
 allowed_user_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton("Help")],
+        [KeyboardButton("Ping"), KeyboardButton("Rules")],
+        [KeyboardButton("Reset")]
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=False
+)
+
+allowed_user_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton("Help")],
+        [KeyboardButton("Ping"), KeyboardButton("Rules")],
+        [KeyboardButton("Reset")]
+    ],
+    resize_keyboard=True
+)ton("Help")],
         [KeyboardButton("Ping"), KeyboardButton("Rules")],
         [KeyboardButton("Reset")]
     ],
@@ -75,12 +92,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     reply_kb = owner_keyboard if user_id == OWNER_ID else allowed_user_keyboard
 
-    USER_STATE[user_id] = {"status": "idle"}
     await update.message.reply_text(
         "Hey there, Rockstar!\nWelcome to your APK Sharing Assistant.\nUse /help to explore powerful features designed just for you!",
-        reply_markup=InlineKeyboardMarkup(inline_keyboard)
+        reply_markup=reply_kb  # <-- THIS SHOWS THE REPLY KEYBOARD
     )
 
+    await update.message.reply_text(
+        "Choose an action below to get started:",
+        reply_markup=InlineKeyboardMarkup(inline_keyboard)
+    )
+    
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if user_id == OWNER_ID:
