@@ -60,11 +60,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # Save basic user data (first name, username)
 USER_DATA[str(user_id)] = {
-    "first_name": update.effective_user.first_name,
-    "username": update.effective_user.username,
-    "channel": USER_DATA.get(str(user_id), {}).get("channel", ""),
-    "caption": USER_DATA.get(str(user_id), {}).get("caption", "")}
-     save_config()
+        "first_name": update.effective_user.first_name,
+        "username": update.effective_user.username,
+        "channel": USER_DATA.get(str(user_id), {}).get("channel", ""),
+        "caption": USER_DATA.get(str(user_id), {}).get("caption", "")
+    }
+    save_config()
 
     inline_keyboard = [
         [InlineKeyboardButton("Add me to Your Channel", url="https://t.me/TrailKeysHandlerBOT?startchannel=true")],
