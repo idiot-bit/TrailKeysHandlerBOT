@@ -253,35 +253,37 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     match = re.search(r'Key\s*-\s*(\S+)', caption)
-if match:
-    key = match.group(1)
+    if match:
+        key = match.group(1)
 
-    user_info = USER_DATA.get(str(user_id), {})
-    saved_caption = user_info.get("caption", "")
-    channel_id = user_info.get("channel", "")
+        user_info = USER_DATA.get(str(user_id), {})
+        saved_caption = user_info.get("caption", "")
+        channel_id = user_info.get("channel", "")
 
-    if not saved_caption or not channel_id:
+        if not saved_caption or not channel_id:
+            await update.message.reply_text(
+                "Please set both your *Caption* and *Channel ID* before sharing!\nUse /start and choose the options.",
+                parse_mode="Markdown"
+            )
+            return
+
+        final_caption = saved_caption.replace("Key -", f"`Key - {key}`")
+        USER_STATE[user_id] = {
+            "file_id": doc.file_id,
+            "caption": final_caption,
+            "status": "confirm_share"
+        }
+        await ask_to_share(update)
+    else:
+        USER_STATE[user_id] = {
+            "file_id": doc.file_id,
+            "caption": "",  # To be filled later
+            "status": "waiting_key"
+        }
         await update.message.reply_text(
-            "Please set both your *Caption* and *Channel ID* before sharing!\nUse /start and choose the options.",
+            "Awesome! Now, please send the *Key* you want to attach.",
             parse_mode="Markdown"
         )
-        return
-
-    final_caption = saved_caption.replace("Key -", f"`Key - {key}`")
-    USER_STATE[user_id] = {
-        "file_id": doc.file_id,
-        "caption": final_caption,
-        "status": "confirm_share"
-    }
-    await ask_to_share(update)
-
-else:
-    USER_STATE[user_id] = {
-        "file_id": doc.file_id,
-        "caption": "",  # To be filled
-        "status": "waiting_key"
-    }
-    await update.message.reply_text("Awesome! Now, please send the *Key* you want to attach.", parse_mode="Markdown")
         
 async def ask_to_share(update: Update):
     keyboard = [
