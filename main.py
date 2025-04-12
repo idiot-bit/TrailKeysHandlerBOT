@@ -22,7 +22,6 @@ USER_DATA = config["user_data"]
 
 START_TIME = time.time()
 USER_STATE = {}  # Tracks per-user upload state
-BOT_ACTIVE = True
 
 owner_keyboard = ReplyKeyboardMarkup(
     keyboard=[
@@ -54,10 +53,8 @@ def save_config():
         }, f, indent=4)
 
 def is_authorized(user_id: int) -> bool:
-    if not BOT_ACTIVE and user_id != OWNER_ID:
-        return False
     return user_id == OWNER_ID or user_id in ALLOWED_USERS
-
+    
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if not is_authorized(user_id):
@@ -264,11 +261,6 @@ async def set_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-    
-    if not BOT_ACTIVE and user_id != OWNER_ID:
-        await update.message.reply_text("Bot is currently OFF. Please wait or contact the owner.")
-        return
-    
     if not is_authorized(user_id):
         await update.message.reply_text("🚀𝗪𝗵𝗮𝘁 𝗕𝗿𝘂𝗵 , 𝗜𝘁❜𝘀 𝗩𝗲𝗿𝘆 𝗪𝗿𝗼𝗻𝗴 𝗕𝗿𝗼 😂")
         return
@@ -324,18 +316,9 @@ async def ask_to_share(update: Update):
     )
 
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    global BOT_ACTIVE  # <--- moved to the top
-
     user_id = update.effective_user.id
     message_text = update.message.text.strip().lower()
-    if user_id = OWNER_ID:
-        await update.message.reply_text("Only the bot owner can turn the bot ON or OFF.")
-        return
-    BOT_ACTIVE = message_text == "on"
-    status = "ON" if BOT_ACTIVE else "OFF"
-    await update.message.reply_text(f"Bot is now {status}.")
-    return
-    
+
     # BUTTON TEXT HANDLING
     if message_text == "ping":
         await ping(update, context)
@@ -352,8 +335,17 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif message_text == "userlist" and user_id == OWNER_ID:
         await userlist(update, context)
         return
-    elif message_text in ("on", "off"):
-    
+    elif message_text == "off" and user_id == OWNER_ID:
+        global BOT_ACTIVE
+        BOT_ACTIVE = False
+        await update.message.reply_text("Bot is now OFF. All user features disabled.")
+        return
+    elif message_text == "on" and user_id == OWNER_ID:
+        global BOT_ACTIVE
+        BOT_ACTIVE = True
+        await update.message.reply_text("Bot is now ON. Users can access features.")
+        return
+
     # EXISTING: Continue handling custom states
     state = USER_STATE.get(user_id)
 
