@@ -324,12 +324,15 @@ async def ask_to_share(update: Update):
     )
 
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    global BOT_ACTIVE  # <--- moved to the top
+
     user_id = update.effective_user.id
     message_text = update.message.text.strip().lower()
     
-    if not BOT_ACTIVE and user_id != OWNER_ID:
-        await update.message.reply_text("Bot is currently OFF. Please wait or contact the owner.")
-        return
+    BOT_ACTIVE = message_text == "on"
+    status = "ON" if BOT_ACTIVE else "OFF"
+    await update.message.reply_text(f"Bot is now {status}.")
+    return
 
     # BUTTON TEXT HANDLING
     if message_text == "ping":
@@ -347,15 +350,9 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif message_text == "userlist" and user_id == OWNER_ID:
         await userlist(update, context)
         return
-    elif message_text == "off" and user_id == OWNER_ID:
-        global BOT_ACTIVE
-        BOT_ACTIVE = False
-        await update.message.reply_text("Bot is now OFF. All user features disabled.")
-        return
-    elif message_text == "on" and user_id == OWNER_ID:
-        global BOT_ACTIVE
-        BOT_ACTIVE = True
-        await update.message.reply_text("Bot is now ON. Users can access features.")
+    elif message_text in ("on", "off"):
+    if user_id != OWNER_ID:
+        await update.message.reply_text("Only the bot owner can turn the bot ON or OFF.")
         return
 
     # EXISTING: Continue handling custom states
