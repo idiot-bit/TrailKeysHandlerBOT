@@ -91,7 +91,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "• /setchennalid 📡\n"
         "• /setcaption 📝\n\n"
         "𝖳𝗁𝖾𝗇 𝗂𝗍 𝖶𝗂𝗅𝗅 𝖡𝖾 𝖥𝗂𝗑𝖾𝖽 ☑️",
-        parse_mode="Markdown"
+        parse_mode="Markdown",
         reply_markup=reply_kb
     )
 
