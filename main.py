@@ -136,8 +136,10 @@ async def add_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if not context.args:
-        await update.message.reply_text(f"Oops! You forgot to give a user ID. Try like this:\n`/adduser` <user_id> ✍️", parse_mode="MarkdownV2")
-        return
+        await update.message.reply_text(
+        "Oops\\! You forgot to give a user ID\\. Try like this:\n`/adduser <user_id>` ✍️",
+        parse_mode="MarkdownV2"
+        )
 
     try:
         user_id = int(context.args[0])
