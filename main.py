@@ -32,7 +32,7 @@ owner_keyboard = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True,
     one_time_keyboard=False
-)
+    )
 
 allowed_user_keyboard = ReplyKeyboardMarkup(
     keyboard=[
@@ -42,7 +42,7 @@ allowed_user_keyboard = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True,
     one_time_keyboard=False
-)
+    )
 
 def save_config():
     with open("config.json", "w") as f:
@@ -520,4 +520,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
