@@ -368,8 +368,6 @@ async def ask_to_share(update: Update):
             parse_mode="Markdown",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
-        
-        reply_markup=InlineKeyboardMarkup(keyboard)
 
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
