@@ -300,8 +300,8 @@ async def set_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
     USER_STATE[user_id] = {"status": "waiting_caption"}
 
     await update.message.reply_text(
-        "📝 *Caption Time \\!*\\n"
-        "Send me your Caption Including\\n"
+        "📝 *Caption Time\\!*\\n"
+        "Send me your Caption Including\\.🎯\n"
         "The Placeholder `Key \\-` 🔑",
         parse_mode="MarkdownV2"
     )
