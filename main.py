@@ -276,9 +276,9 @@ async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
     save_config()
     
     await update.message.reply_text(
-        "♻️ *Boom!* All captions and channel IDs just got wiped cleaner than your browser history! ✨\n"
-        "Ready for a fresh start! ⚙️",
-        parse_mode="Markdown"
+       "♻️ *Boom\\!* Cleared all captions & channels\\.✨\n"
+       "Ready for a fresh start\\. ⚙️",
+       parse_mode="MarkdownV2"
     )
     
 async def set_channel_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
