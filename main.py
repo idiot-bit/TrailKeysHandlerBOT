@@ -347,7 +347,7 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if not saved_caption:
             await update.message.reply_text(
-                "📝 *You haven\\'t set a Caption yet\\!*\\n"
+                "📝 *You haven\\'t set a Caption yet\\!*\n"
                 "Use → `/setcaption` → 𝖠𝖽𝖽 𝖸𝗈𝗎𝗋 𝖪𝖾𝗒 𝖢𝖺𝗉𝗍𝗂𝗈𝗇",
                 parse_mode="MarkdownV2"
             )
@@ -355,7 +355,7 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if not channel_id:
             await update.message.reply_text(
-                "📡 *Channel ID not found\\!*\\n"
+                "📡 *Channel ID not found\\!*\n"
                 "Use → `/setchannelid` → 𝖺𝖽𝖽 𝖸𝗈𝗎𝗋 𝖢𝗁𝖺𝗇𝗇𝖾𝗅",
                 parse_mode="MarkdownV2"
             )
