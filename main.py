@@ -277,7 +277,7 @@ async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await update.message.reply_text(
     "🧹 *Cleaned up\\!* No more caption or channel\\n\"
-    ". Ready to Setup\\. 🚀",
+    "Ready to Setup\\. 🚀",
     parse_mode="MarkdownV2"
     )
     
