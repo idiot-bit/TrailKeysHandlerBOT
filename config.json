@@ -1,0 +1,22 @@
+{
+  "owner_id": 7715278630,
+  "allowed_users": [],
+  "user_data": {},
+  "setups": {
+    "1": {
+      "source_channel": "",
+      "destination_channel": "",
+      "caption": ""
+    },
+    "2": {
+      "source_channel": "",
+      "destination_channel": "",
+      "caption": ""
+    },
+    "3": {
+      "source_channel": "",
+      "destination_channel": "",
+      "caption": ""
+    }
+  }
+}
