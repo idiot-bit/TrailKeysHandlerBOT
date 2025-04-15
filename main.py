@@ -412,8 +412,9 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "file_id": doc.file_id,
             "caption": final_caption,
             "status": "confirm_share"
-        }            
-            await ask_to_share(update)
+        }
+        
+        await ask_to_share(update)
         
         match = re.search(r'Key\s*-\s*(\S+)', caption)
         if not match:
