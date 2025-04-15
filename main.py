@@ -626,7 +626,7 @@ async def monitor_apks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if not doc.file_name.lower().endswith(".apk"):
-    return  # Only handle APKs
+        return  # Only handle APKs
     caption = update.message.caption or ""
     file_size = doc.file_size
     incoming_chat_id = str(update.message.chat.id)
