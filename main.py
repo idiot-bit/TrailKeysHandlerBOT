@@ -641,7 +641,7 @@ async def monitor_apks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     key = key_match.group(1)
 
     for setup_number, setup in SETUPS.items():
-    print(f"[Monitor] Incoming from {incoming_chat_id}, checking setup {setup_number}")  # ← correctly indented log
+        print(f"[Monitor] Incoming from {incoming_chat_id}, checking setup {setup_number}")  # ← correctly indented log
     if not all(setup.values()):
         await context.bot.send_message(OWNER_ID, f"⚠️ Setup {setup_number} incomplete. Skipping.")
         continue
