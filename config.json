@@ -1,0 +1,16 @@
+{
+  "owner_id": 123456789,
+  "allowed_users": [],
+  "user_data": {},
+  "channel_mappings": {
+    "sourcechannel1": "",
+    "sourcechannel2": "",
+    "sourcechannel3": "",
+    "desichannel1": "",
+    "desichannel2": "",
+    "desichannel3": "",
+    "targetcaption1": "",
+    "targetcaption2": "",
+    "targetcaption3": ""
+  }
+}
