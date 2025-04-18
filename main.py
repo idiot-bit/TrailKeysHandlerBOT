@@ -381,7 +381,7 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             return
 
-        final_caption = saved_caption.replace("Key -", f"Key - `{key}`")
+        final_caption = saved_caption.replace("Key -", f"Key - <code>{key}</code>")
         USER_STATE[user_id] = {
             "file_id": doc.file_id,
             "caption": final_caption,
