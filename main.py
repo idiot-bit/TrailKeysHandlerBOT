@@ -790,7 +790,7 @@ async def method2_show_preview(user_id, context):
     await context.bot.edit_message_text(
         chat_id=user_id,
         message_id=USER_STATE[user_id]["preview_message_id"],
-        text += f"📦 APK {idx}: Key - {key}\n",
+        text += f"📦 APK {idx}: Key - {key}\n"
         parse_mode="Markdown",
         reply_markup=InlineKeyboardMarkup(buttons)
     )
