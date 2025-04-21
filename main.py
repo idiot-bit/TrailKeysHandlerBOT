@@ -498,10 +498,15 @@ async def method2_send_to_channel(user_id, context):
         posted_ids.append(sent_message.message_id)
         last_message = sent_message
 
-    # Update User session
+    if len(posted_ids) == 1:
+    # Only 1 apk sent, so clear session immediately
+    USER_STATE[user_id]["session_files"] = []
+    USER_STATE[user_id]["saved_key"] = None
     USER_STATE[user_id]["waiting_key"] = False
     USER_STATE[user_id]["last_apk_time"] = None
-    USER_STATE[user_id]["apk_posts"] = posted_ids
+    USER_STATE[user_id]["preview_message_id"] = None
+    USER_STATE[user_id]["key_mode"] = "normal"
+    USER_STATE[user_id]["apk_posts"] = []
     
     if last_message:
         if channel_id.startswith("@"):
@@ -618,13 +623,14 @@ async def auto_recaption(user_id, context):
         reply_markup=InlineKeyboardMarkup(buttons)
     )
     
-    # After auto recaption and posting new, clean user session
+     ## After successful re-caption
     USER_STATE[user_id]["session_files"] = []
     USER_STATE[user_id]["saved_key"] = None
     USER_STATE[user_id]["waiting_key"] = False
     USER_STATE[user_id]["last_apk_time"] = None
-    USER_STATE[user_id]["current_method"] = None
-    USER_STATE[user_id]["status"] = "selecting_method"
+    USER_STATE[user_id]["preview_message_id"] = None
+    USER_STATE[user_id]["key_mode"] = "normal"
+    USER_STATE[user_id]["apk_posts"] = []
 
 async def check_session_timeout(user_id, context):
     await asyncio.sleep(5)
