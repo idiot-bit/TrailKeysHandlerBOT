@@ -1284,7 +1284,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         USER_STATE[user_id]["status"] = "normal"
 
         buttons = [
-            [InlineKeyboardButton("🌟 Bot Admin", url="https://t.me/TrailKeyHandlerBOT?startchannel=true")],
+            [InlineKeyboardButton("🌟 Bot Admin", url="https://t.me/TrailKeysHandlerBOT?startchannel=true")],
             [InlineKeyboardButton("📡 Set Channel", callback_data="set_channel")],
             [InlineKeyboardButton("📝 Set Caption", callback_data="set_caption")]
         ]
